@@ -12,6 +12,7 @@ import controllers.helpers._
 import controllers.traits._
 import models._
 import views._
+import scala.util.control.NonFatal
 
 object Authentication extends Controller with Security {
     val signupForm = Form(
@@ -40,17 +41,14 @@ object Authentication extends Controller with Security {
         signupForm.bindFromRequest.fold(
             formWithErrors => BadRequest(html.authentication.signup(formWithErrors)),
             user => {
-                // there will be an exception if email's already in database, hence the try-catch block.
-                // Anorm might be leaking abstraction here. Note this for future update.
                 try {
                     Users.create(user)
                     Redirect(routes.Authentication.login).flashing("registration" -> "Your account have been created. You can now login and start using PlayJournal.")
                 }
                 catch {
-                    case e => {
-                        val formWithErrors = signupForm.copy(errors = Seq(FormError("email", "Email already registered. Please recheck your email."))).fill(user)
-                        BadRequest(html.authentication.signup(formWithErrors))
-                    }
+                    case NonFatal(e) =>
+                      val formWithErrors = signupForm.copy(errors = Seq(FormError("email", "Email already registered. Please recheck your email."))).fill(user)
+                      BadRequest(html.authentication.signup(formWithErrors))
                 }
             }
         )
@@ -66,7 +64,6 @@ object Authentication extends Controller with Security {
             loginInfo => {
                 val user: Users = Users.findByEmail(loginInfo._1) match {
                     case Some(u) => u
-                    // there should be no wrong email by now. It has been authenticated by Users.authenticate before!
                     case None    => throw new Exception("FATAL ERROR: Authentication.Authenticate get the wrong email.")
                 }
 

@@ -1,1 +1,5 @@
 application.name = Blog
+application.btn_clear= Clear
+application.btn_create = Create New Account
+application.btn_Login = Login
+application.newer_post = Newer Posts

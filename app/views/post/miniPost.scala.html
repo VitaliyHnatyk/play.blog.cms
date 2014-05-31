@@ -1,0 +1,18 @@
+
+@(post: Post)
+@import views.helper.Format
+@import views.helper.Markdown
+
+<div class="mini-post">
+	<h1>
+        <a href="@routes.Post.show(post.id.get, post.titleSlug)">@post.title</a>
+	</h1>
+    <div class="post-info">
+        <i class="icon-pencil"></i> @Users.findById(post.writer).map(u => u.name) &nbsp;
+        <i class="icon-time"></i> @Format.date(post.created)
+    </div>
+	<div class="mini-post-content">
+		@Html(Format.markdown(Markdown.getFirstParagraph(post.content)))
+	</div>
+	<a href="@routes.Post.show(post.id.get, post.titleSlug)" title="read @post.title"><button class="btn btn-info">Read more</button></a>
+</div>

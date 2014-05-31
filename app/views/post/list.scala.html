@@ -1,0 +1,50 @@
+@(posts: models.extra.Page[models.Post])(implicit request: play.api.mvc.RequestHeader, flash: Flash)
+
+@import views.helper.Format
+
+@main("Your Posts", "post.list") {
+    <h1>Your Posts <small>create, edit, and delete</small></h1>
+    <table class="table table-bordered table-stripped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Post Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tfoot>
+            <tr>
+                <td colspan="2">
+                @views.html.helper.paginator(posts.prev.map {
+                    page => routes.Post.list(page).absoluteURL(false)
+                }.getOrElse(""),
+                    "Newer Posts",
+                    posts.next.map {
+                        page => routes.Post.list(page).absoluteURL(false)
+                    }.getOrElse(""),
+                    "Older Post")
+                </td>
+                <td style="text-align : right ;"><a href="@routes.Post.create"><button class="btn btn-success">
+                    New Post</button></a></td>
+            </tr>
+        </tfoot>
+        <tbody>
+            @if(posts.items.isEmpty) {
+                <tr><td colspan="2" style="text-align : center ;">You have no post yet. <a href="@routes.Post.create">
+                    Create a new post!</a></td></tr>
+            }
+            @posts.items.map { post =>
+                <tr>
+                    <td>@post.title</td>
+                    <td>
+                    @Format.date(post.created)
+                    </td>
+                    <td>
+                        <a href="@routes.Post.edit(post.id.get)" title="edit post"><i class="icon-edit"></i></a>
+                        <a href="@routes.Post.show(post.id.get, post.titleSlug)" title="view post"><i class="icon-share-alt"></i></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

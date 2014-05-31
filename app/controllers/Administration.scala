@@ -12,6 +12,7 @@ import models._
 import views._
 
 import controllers.traits.Security
+import scala.util.control.NonFatal
 
 object Administration extends Controller with Security {
     val siteInfoForm = Form(
@@ -40,7 +41,7 @@ object Administration extends Controller with Security {
                         Redirect(routes.Application.index())
                     }
                     catch {
-                        case e => InternalServerError
+                        case NonFatal(e) => InternalServerError
                     }
                 }
             )

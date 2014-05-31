@@ -1,0 +1,64 @@
+@(post: models.Post)(implicit request: play.api.mvc.RequestHeader, flash: Flash)
+
+@import controllers.helpers.SessionHelper
+@import views.helper.Format
+
+@javascripts = {
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/jquery.toc.min.js")"></script>
+    <script type="text/javascript" src="@routes.Assets.at("google-code-prettify/prettify.js")"></script>
+}
+
+@stylesheets = {
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/post.css")">
+    <link rel="stylesheet" media="screen" href="@routes.Assets.at("google-code-prettify/prettify.css")">
+}
+
+@main(post.title, "post.show", javascripts, stylesheets){
+<div class="post row">
+	<div id="controls" class="span4 hidden-phone">
+		@if(SessionHelper.getUserId == post.writer){
+		    <div class="actions">
+				<h3>Actions</h3>
+				<div class="btn-group">
+		    		<a href="@routes.Post.edit(post.id.getOrElse(0))" class="btn btn-warning">Edit Post</a>
+		    		<a href="" class="btn btn-danger">Delete Post</a>
+				</div>
+			</div>
+		}
+		
+		<h3>Contents</h3>
+    	<ul id="toc"></ul>
+	</div>
+	<div class="post-content span8 offset4">
+		@if(flash.get("security").exists(_ => true)){
+		   	<div class="alert alert-warning">
+	   			<strong>Security warning:</strong> @flash.get("security")
+			</div>
+	   	}
+		
+		<h1>@post.title</h1>
+        <div class="post-info">
+            <i class="icon-pencil"></i> @Users.findById(post.writer).map(u => u.name) &nbsp;
+            <i class="icon-time"></i> @Format.date(post.created)
+        </div>
+    	@Html(Format.markdown(post.content))
+	</div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        // table of contents generation
+        $("#toc").toc({
+            'selectors': 'h1,h2,h3,h4,h5,h6',
+            'container': 'div.post-content',
+            'onHighlight': function(el){}
+        });
+
+        // code prettify
+        $("pre").each(function(){
+            $(this).addClass("prettyprint linenums")
+        });
+        prettyPrint();
+    });
+</script>
+}

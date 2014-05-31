@@ -1,0 +1,34 @@
+@(loginForm: Form[(String, String)])(implicit request: play.api.mvc.RequestHeader, flash: Flash)
+
+@import helper._
+
+@implicitField = @{FieldConstructor(bootstrapInput.f)}
+
+@main("Login", "login") {
+	<div class="span5 hidden-phone">
+		<a href="#" class="thumbnail">
+			<img src="http://placehold.it/450x300">
+		</a>
+	</div>
+	@helper.form(routes.Authentication.authenticate, 'class -> "form-horizontal span6"){
+	<fieldset>
+	<legend>Your Login Information</legend>
+	
+	@if(loginForm.hasGlobalErrors){
+		<div class="alert alert-error">
+			@loginForm.globalErrors.map { error =>
+				<strong>Error: </strong> @error.message <br>
+			}
+		</div>
+	}
+	
+	@inputText(loginForm("email"))
+	@inputPassword(loginForm("password"))
+	
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary">@Messages("application.btn_Login")</button>
+		<button type="reset" class="btn">@Messages("application.btn_clear")</button>
+	</div>
+	</fieldset>
+	}
+}
